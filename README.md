@@ -4,6 +4,6 @@ Code names but UCSC based.
 pip install python-dotenv 
 
 create a file named .flaskenv in this directory and put this in it:
-set FLASK_APP=microblog.py
+set FLASK_APP=slugnames.py
 
 then you can use flask run to run the application
