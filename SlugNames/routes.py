@@ -1,6 +1,7 @@
 from flask import render_template 
 from SlugNames import app
 
-@app.route('/index')
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
-    return('route defs')
+    return render_template('index.html')
