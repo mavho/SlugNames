@@ -4,4 +4,5 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
-import routes
+
+from SlugNames import routes
