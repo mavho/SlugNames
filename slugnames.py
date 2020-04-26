@@ -1,0 +1,1 @@
+from SlugNames import app
