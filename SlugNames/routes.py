@@ -1,12 +1,10 @@
 from flask import render_template 
 from SlugNames import app
 from SlugNames.namesGenerator import generateNames
-
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 def index():
-    thenames = generatename
-    return render_template('index.html')
+    return render_template('layouts/index.html')
 
 @app.route('/game', methods=['GET'])
 def theGame():
