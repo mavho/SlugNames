@@ -1,7 +1,12 @@
 {% extends 'bootstrap/base.html' %}
 
+
 {% block title %}
-SlugNames 
+SlugNames
+{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='node_modules/socket.io-client/dist/socket.io.js') }}"></script>
 {% endblock %}
 
 {% block navbar %}
@@ -41,4 +46,8 @@ SlugNames
 
     {% block app_content %}{% endblock %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+    {% include "_includes/scripts.html" %}
 {% endblock %}
