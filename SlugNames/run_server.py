@@ -1,4 +1,4 @@
-from flask import Flask, render_template,url_for
+from flask import Flask, render_template,url_for, request, jsonify, redirect
 from flask_bootstrap import Bootstrap
 from flask_socketio import SocketIO, emit,join_room,leave_room
 from RoomMaster import RoomMaster
@@ -20,10 +20,14 @@ CHANNELS = {}
 def index():
     return render_template('layouts/index.html')
 
-@app.route('/game', methods=['GET'])
-def theGame():
+@app.route('/game/<roomid>', methods=['GET'])
+def theGame(roomid):
+    # print(CHANNELS[roomid].word_board, file=sys.stderr)
     #thenames is a 5x5 2d list with the words for codenames 
-    return render_template('layouts/game_room.html')
+
+    return render_template('layouts/game_room.html', thenames=CHANNELS[roomid].word_board, roomid=roomid)   #thenames=CHANNELS[roomid].word_board)
+
+
 
 @socketio.on('create room',namespace='/test')
 def create_room(data):
@@ -39,8 +43,8 @@ def create_room(data):
     ## TODO: Check for duplicate rooms. Return different templates
     CHANNELS[room] = GM 
     join_room(room)
-    url = url_for('theGame') 
-    print("Client joined " + room, file=sys.stderr)
+    url = url_for('theGame', roomid=room) 
+    print("Client " + user_name + " joined " + room, file=sys.stderr)
     emit('create room', {'GM': str(GM.word_board), 'url': url}, room=room)
 
 @socketio.on('flip card', namespace='/test')
@@ -50,7 +54,7 @@ def flip_card(data):
     TODO: Client side needs to access this somehow
     """
     # data should have room name or something
-    print('Flip card', file=sys.stderr)
+    print('Flip card ' + str(data['card']) + ' ' + str(data['roomid']) , file=sys.stderr)
 
 
 @socketio.on('connect',namespace='/test')

@@ -5,4 +5,18 @@ game UI
 It also will obtain info and send info to the webservice
 */
 
-console.log("You're in the game page!");
+$(document).ready(function() {
+    console.log("Game page!");
+    var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+    var thewords = $(".test");
+    for(var i = 0; i < thewords.length; i++) {
+        thewords[i].addEventListener("click", bindClick(i));
+    }
+ 
+    function bindClick(i) {
+        return function() {
+            console.log("this number was clicked:  " + i);
+            socket.emit("flip card", {'card': i,  'roomid': roomid });
+        };
+    }
+});
