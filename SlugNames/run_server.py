@@ -41,7 +41,7 @@ def create_room(data):
     join_room(room)
     url = url_for('theGame') 
     print("Client joined " + room, file=sys.stderr)
-    emit('create room', {'GM': str(GM.word_board), 'url': url}, room=room)
+    emit('create room', {'GM': str(GM.word_board), 'url': url, 'user_name':user_name}, room=room)
 
 @socketio.on('flip card', namespace='/test')
 def flip_card(data):
