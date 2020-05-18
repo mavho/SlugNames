@@ -1,10 +1,11 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 
 
-var socket = socket.on('create room', function(msg){
+socket.on('create room', function(msg){
     console.log(msg);
-    $.ajax(msg['url']).done(function(reply){
-        $('#container').html(reply);
+    $.ajax({
+        url: msg['url']}).done(function(reply){
+            $('#container').html(reply);
     });
 });
 

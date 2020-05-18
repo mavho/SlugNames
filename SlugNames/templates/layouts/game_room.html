@@ -2,10 +2,34 @@
 
 {% block content %}
 <h6>GAME PAGE</h6>
+    <table id="mydiv" class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+                </tr>
+        </thead>
+        <tbody>
+        {% for row in thenames %}
+            <tr>
+            {% for names in row %}
+                <td class="test"> <button type="button" class="btn btn-primary"> {{ names }} </button></td>
+            {% endfor %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+            
 {% endblock %}
 <!--Include DOM objects here.Should be UI of the game-->
 
 {% block scripts %}
     {{ super() }}
-    <script src="static/js/game_page.js"></script>
+    <script type="text/javascript"> 
+        var roomid ='{{ roomid }}'
+        var url = "/static/js/game_page.js"
+        $.getScript(url);
+    </script>
 {% endblock %}
