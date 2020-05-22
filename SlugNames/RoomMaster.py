@@ -25,6 +25,8 @@ class RoomMaster():
         self.innocent_bystanders_count = 7
         self.word_board = self._generateWordBoard() 
         self.state_board = self._generateStateBoard()
+        self.users = []
+        self.usersid = {} 
 
 
     def changeWordBoard(self):

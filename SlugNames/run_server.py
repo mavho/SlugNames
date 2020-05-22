@@ -41,11 +41,49 @@ def create_room(data):
     room = data['room']
     user_name = data['user_name']
     ## TODO: Check for duplicate rooms. Return different templates
-    CHANNELS[room] = GM 
+    if(CHANNELS.get(room) is None):
+        host = True 
+        CHANNELS[room] = GM
+    else: 
+        print("Duplicate room!", file=sys.stderr)
+        return
     join_room(room)
     url = url_for('theGame', roomid=room) 
-    print("Client " + user_name + " joined " + room, file=sys.stderr)
-    emit('create room', {'GM': str(GM.word_board), 'url': url}, room=room)
+    GM.users.append(user_name)
+    print("Host " + user_name + " created " + room, file=sys.stderr)  
+    emit('create room', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users, 'room': room}, room=room)
+
+#this is a lot of duplicate code, can probably refactor later 
+@socketio.on('join theroom', namespace='/test')
+def join_theroom(data):
+    room = data['room']
+    user_name = data['user_name']
+    if(CHANNELS.get(room) is None):
+        print("Room doesn't exist you bumbo", file=sys.stderr)
+        return
+    GM = CHANNELS[room]
+    if(user_name in GM.users):
+        print("Duplicate username", file=sys.stderr)
+        return 
+    join_room(room)
+    url = url_for('theGame', roomid=room)
+    print("Client " + user_name +" joined " + room, file=sys.stderr)
+    GM.users.append(user_name)
+    emit('join theroom', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users}, room=room)
+
+@socketio.on('start game', namespace='/test')
+def start_game(data):
+    room = data['room']
+    if(CHANNELS.get(room) is None):
+        print("Tried to start game but room doesn't exist... strange", file=sys.stderr)
+        return
+    GM = CHANNELS[room]
+    if(len(GM.users) < 4):
+        print("Need at least 4 users", file=sys.stderr)
+        return    
+    url = url_for('theGame', roomid=room)
+    print("Starting game for room: " + room, file=sys.stderr)
+    emit('start game', {'url': url}, room=room)
 
 @socketio.on('flip card', namespace='/test')
 def flip_card(data):
@@ -59,11 +97,12 @@ def flip_card(data):
 
 @socketio.on('connect',namespace='/test')
 def test_connect():
-    print('Client connected',file=sys.stderr)
+    print('Client connected ' + request.sid, file=sys.stderr)
     emit('my response',{'data':'Hello'})
 
 @socketio.on('disconnect',namespace='/test')
 def test_disconnect():
+    print('This guy disconnected: ' + request.sid, file=sys.stderr)
     print('Client disconnected', file=sys.stderr)
 
 
