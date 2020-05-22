@@ -27,8 +27,8 @@ class RoomMaster():
         self.innocent_bystanders_count = 7
         self.word_board = self._generateWordBoard() 
         self.state_board = self._generateStateBoard()
-        self.users = []
-        self.usersid = {} 
+        self.users = [] #a list of all the usernames in the room 
+        self.usersid = {}  #usersid is a dictionary where username maps to their corresponding sid 
 
 
     def changeWordBoard(self):

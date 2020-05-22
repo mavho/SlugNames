@@ -14,15 +14,15 @@ socket.on('create room', function(msg){
         $("#users_list").append(allusers[i]); //show all users on the page 
         $("#users_list").append("<br>");
     }
-    var startButton = $('<button/>').text('Test').click(function () { 
-        socket.emit("start game", {'room': msg['room']});
-        // $.ajax({
-        //     url: msg['url']}).done(function(reply){
-        //         $('#container').html(reply);
-        // });
+    var startButton = $('<button/>').text('Start the game').click(function () { 
+        socket.emit("start game", {'room': msg['room'], 'hardStart': 'false'});
     });
 
+    var startButton2 = $('<button/>').text('HARD START').click(function () { 
+        socket.emit("start game", {'room': msg['room'], 'hardStart': 'true'});
+    });
     $("#start_shit").append(startButton); 
+    $("#start_shit").append(startButton2); //startButton2 just makes it so you dont need 4 players, for debugging
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
 

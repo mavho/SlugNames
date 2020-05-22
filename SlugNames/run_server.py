@@ -50,6 +50,7 @@ def create_room(data):
     join_room(room)
     url = url_for('theGame', roomid=room) 
     GM.users.append(user_name)
+    GM.usersid[user_name] = request.sid 
     print("Host " + user_name + " created " + room, file=sys.stderr)  
     emit('create room', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users, 'room': room}, room=room)
 
@@ -69,6 +70,7 @@ def join_theroom(data):
     url = url_for('theGame', roomid=room)
     print("Client " + user_name +" joined " + room, file=sys.stderr)
     GM.users.append(user_name)
+    GM.usersid[user_name] = request.sid
     emit('join theroom', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users}, room=room)
 
 @socketio.on('start game', namespace='/test')
@@ -78,7 +80,7 @@ def start_game(data):
         print("Tried to start game but room doesn't exist... strange", file=sys.stderr)
         return
     GM = CHANNELS[room]
-    if(len(GM.users) < 4):
+    if( (len(GM.users) < 4) and (data['hardStart'] == 'false') ):
         print("Need at least 4 users", file=sys.stderr)
         return    
     url = url_for('theGame', roomid=room)
