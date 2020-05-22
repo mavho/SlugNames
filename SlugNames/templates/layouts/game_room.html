@@ -13,9 +13,15 @@
         </thead>
         <tbody>
         {% for row in thenames %}
-            <tr>
+            <tr >
             {% for names in row %}
-                <td class="test"> <button type="button" class="btn btn-primary"> {{ names }} </button></td>
+                <td class="test">
+                    <div class="card cell">
+                        <span class="card-body cell">
+                        {{ names }}
+                        </span>
+                     </div>
+                </td>
             {% endfor %}
             </tr>
         </tbody>
