@@ -28,7 +28,7 @@ def theGame(roomid):
     return render_template('layouts/game_room.html', thenames=CHANNELS[roomid].word_board, roomid=roomid)   #thenames=CHANNELS[roomid].word_board)
 
 
-
+#Host creates a room, and is able to start the game 
 @socketio.on('create room',namespace='/test')
 def create_room(data):
     """
@@ -52,8 +52,10 @@ def create_room(data):
     GM.users.append(user_name)
     GM.usersid[user_name] = request.sid 
     print("Host " + user_name + " created " + room, file=sys.stderr)  
+
     emit('create room', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users, 'room': room}, room=room)
 
+#users join room that a host created 
 #this is a lot of duplicate code, can probably refactor later 
 @socketio.on('join theroom', namespace='/test')
 def join_theroom(data):
@@ -100,7 +102,18 @@ def start_game(data):
     print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
     print("Starting game for room: " + room, file=sys.stderr)
-    emit('start game', {'url': url}, room=room)
+    print('Dictionaries: ')
+    print(str(GM.usersid))
+    for user in GM.team_red:
+        if user in GM.spymasters:
+            emit('start game', {'url': url, 'spy': 'true', 'team': 'red'}, room=GM.usersid[user])
+        else:
+            emit('start game', {'url': url, 'spy' : 'false', 'team': 'red'}, room=GM.usersid[user])
+    for user in GM.team_blue:
+        if user in GM.spymasters: 
+            emit('start game', {'url': url, 'spy': 'true', 'team': 'blue'}, room=GM.usersid[user])
+        else:
+            emit('start game', {'url': url, 'spy' : 'false', 'team': 'blue'}, room=GM.usersid[user])
 
 @socketio.on('flip card', namespace='/test')
 def flip_card(data):

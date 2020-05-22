@@ -3,12 +3,12 @@ var socket = io.connect('http://' + document.domain + ':' + location.port + '/te
 socket.on('create room', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
-    console.log(msg);
+    // console.log(msg);
     allusers = msg['allusers'];
     $("#users_list").empty(); //just clear the list each time so we don't have duplicates
     for (var i = 0; i < allusers.length; i++) {
-        console.log("User " + i + "found.");
-        console.log(allusers[i]);
+        // console.log("User " + i + "found.");
+        // console.log(allusers[i]);
         var aUser = $('<li class="list-group-item"/>');
         aUser.innerHTML = allusers[i];
         $("#users_list").append(allusers[i]); //show all users on the page 
@@ -34,8 +34,8 @@ socket.on('join theroom', function(msg){
     allusers = msg['allusers'];
     $("#users_list").empty();
     for (var i = 0; i < allusers.length; i++) {
-        console.log("User " + i + "found.");
-        console.log(allusers[i]);
+        // console.log("User " + i + "found.");
+        // console.log(allusers[i]);
         var aUser = $('<li class="list-group-item"/>');
         aUser.innerHTML = allusers[i];
         $("#users_list").append(allusers[i]); //show all users on the page 
@@ -44,6 +44,12 @@ socket.on('join theroom', function(msg){
 });
 
 socket.on('start game', function(msg) {
+    if (msg['spy'] == 'true'){
+        console.log('You are a spymaster on team ' + msg['team']);
+    }
+    else{
+        console.log('You are an agent on team ' + msg['team']);
+    }
     $.ajax({
         url: msg['url']}).done(function(reply){
             $('#container').html(reply);

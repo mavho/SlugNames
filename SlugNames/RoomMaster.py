@@ -17,7 +17,8 @@ class RoomMaster():
             'Porter', 'College Nine/Ten', 'Stevenson', 'Crown', 'Seshadhri', \
             'Dimitris', 'Slug', 'Deer', 'International', 'Hello Kitty', \
             'Gaming', '4/20', 'Marijuana', 'Psychidelics', 'Bus', \
-            'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2']
+            'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2', \
+            'MOSS', 'Cheating', 'Shrooms', 'Sage the Gemini', 'SJW']
 
         self.flippedCards_set = set()
         self.team_red = []
