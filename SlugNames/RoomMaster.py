@@ -20,12 +20,12 @@ class RoomMaster():
             'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2']
 
         self.flippedCards_set = set()
+        ###TODO change to dictionary
         self.team_red = []
         self.team_blue = []
         self.spymasters = [] #first spymaster is red's, second is blue's 
         self.red_agent_count = 8
-        self.blue_agent_count = 8
-        self.double_agent_count = 1 
+        self.blue_agent_count = 9 
         self.assasin_count = 1
         self.innocent_bystanders_count = 7
         self.word_board = self._generateWordBoard() 
@@ -62,12 +62,12 @@ class RoomMaster():
         Places agents and bystanders across a board
         R: Red, B: BLUE, D:double, A: Assasin, I: bystander
         """
-        hold = ['A','D']
-        for r in range(8):
+        hold = ['A']
+        for r in range(self.red_agent_count):
             hold.append('R')
-        for r in range(8):
+        for r in range(self.blue_agent_count):
             hold.append('B')
-        for r in range(7):
+        for r in range(self.innocent_bystanders_count):
             hold.append('I')
         random.shuffle(hold)
         res = [[0] * (5) for i in range(5)]
@@ -76,7 +76,7 @@ class RoomMaster():
                 res[i][n] = hold[i*5 + n]
         return res
 
-    def flipCard(self, row,col):
+    def flipCard(self, row,col, username):
         """
         Returns a tuple, (state,word) if successful.
         On duplicate cards returns a tuple with empty strings
@@ -84,5 +84,20 @@ class RoomMaster():
         if (row,col) in self.flippedCards_set:
             print("already flipped before", file=sys.stderr)
             return('','')
-        # update the game state
+
+        flipped_card = self.state_board[row][col]
+        self.flippedCards_set.add((row,col))
+         
+        if flipped_card != 'A' or flipped_card != 'I':
+            self._decrement(flipped_card,username)
+
         return (self.state_board[row][col], self.word_board[row][col])
+
+    def _decrement(self, card, username):
+        if card == 'B':
+            self.blue_agent_count -= 1
+        elif card == 'R':
+            self.red_agent_count -= 1
+        
+
+    

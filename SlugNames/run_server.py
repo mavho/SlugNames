@@ -95,11 +95,11 @@ def start_game(data):
     spyblue = random.randrange(0, len(GM.team_blue))
     GM.spymasters.append(GM.team_red[spyred])
     GM.spymasters.append(GM.team_blue[spyblue])
+    print("Starting game for room: " + room, file=sys.stderr)
     print('Chumps on team red: ' + str(GM.team_red))
     print('Chumps on team blue: ' + str(GM.team_blue))
     print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
-    print("Starting game for room: " + room, file=sys.stderr)
     emit('start game', {'url': url}, room=room)
 
 @socketio.on('flip card', namespace='/test')
@@ -109,15 +109,16 @@ def flip_card(data):
     TODO: Client side needs to access this somehow
     """
     # data should have room name or something
-    print('Flip card ' + str(data['row']) + ' ' + str(data['col']) + ' ' +  str(data['roomid']) , file=sys.stderr)
+    print('Flip card ' + str(data['row']) + ' ' + str(data['col']) + ' ' +  str(data['roomid'] + ' ' + str(data['username'])) , file=sys.stderr)
     room = data['roomid']
     row = data['row']
     col = data['col']
+    username = data['username']
     GM = CHANNELS[room]
-    print(GM.word_board,file=sys.stderr)
-    print(GM.state_board,file=sys.stderr)
-    action = GM.flipCard(row,col)
-    emit('flip card',{'row': row, 'col': col, 'action':action}, room=room, include_self=False)
+    action = GM.flipCard(row,col,username)
+    print(GM.red_agent_count, file=sys.stderr)
+    print(GM.blue_agent_count, file=sys.stderr)
+    emit('flip card',{'row': row, 'col': col, 'action':action,'user':username}, room=room, include_self=False)
 
 
 @socketio.on('connect',namespace='/test')

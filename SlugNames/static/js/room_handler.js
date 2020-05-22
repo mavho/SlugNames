@@ -1,19 +1,13 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+var user_name = "";
+var team = "";
 
 socket.on('create room', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
     console.log(msg);
     allusers = msg['allusers'];
-    $("#users_list").empty(); //just clear the list each time so we don't have duplicates
-    for (var i = 0; i < allusers.length; i++) {
-        console.log("User " + i + "found.");
-        console.log(allusers[i]);
-        var aUser = $('<li class="list-group-item"/>');
-        aUser.innerHTML = allusers[i];
-        $("#users_list").append(allusers[i]); //show all users on the page 
-        $("#users_list").append("<br>");
-    }
+    createUsersList(allusers);
     var startButton = $('<button/>').text('Start the game').click(function () { 
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'false'});
     });
@@ -32,6 +26,10 @@ socket.on('join theroom', function(msg){
     $("#create_room").hide();
     console.log(msg);
     allusers = msg['allusers'];
+    createUsersList(allusers);
+});
+
+function createUsersList(allusers){
     $("#users_list").empty();
     for (var i = 0; i < allusers.length; i++) {
         console.log("User " + i + "found.");
@@ -41,7 +39,7 @@ socket.on('join theroom', function(msg){
         $("#users_list").append(allusers[i]); //show all users on the page 
         $("#users_list").append("<br>");
     }
-});
+}
 
 socket.on('start game', function(msg) {
     $.ajax({
@@ -63,5 +61,4 @@ document.querySelector("#join_room").addEventListener("click", () => {
     room_name = document.getElementById("room_input").value;
     user_name = document.getElementById("username_input").value;
     socket.emit("join theroom", {'room': room_name, 'user_name':user_name});
-
-})
+});
