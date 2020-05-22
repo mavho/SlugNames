@@ -26,6 +26,7 @@ socket.on('create room', function(msg){
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
 
+//again tons of duplicate code, can def refactor lol...
 socket.on('join theroom', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
