@@ -18,6 +18,8 @@ class RoomMaster():
             'Dimitris', 'Slug', 'Deer', 'International', 'Hello Kitty', \
             'Gaming', '4/20', 'Marijuana', 'Psychidelics', 'Bus', \
             'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2']
+
+        self.flippedCards_set = set()
         self.red_agent_count = 8
         self.blue_agent_count = 8
         self.double_agent_count = 1 
@@ -69,4 +71,12 @@ class RoomMaster():
                 res[i][n] = hold[i*5 + n]
         return res
 
-
+    def flipCard(self, row,col):
+        """
+        Returns a tuple, (state,word) if successful.
+        On duplicate cards returns a tuple with empty strings
+        """
+        if (row,col) in self.flippedCards_set:
+            print("already flipped before", file=sys.stderr)
+            return('','')
+        return (self.state_board[row][col], self.word_board[row][col])

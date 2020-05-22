@@ -54,7 +54,15 @@ def flip_card(data):
     TODO: Client side needs to access this somehow
     """
     # data should have room name or something
-    print('Flip card ' + str(data['card']) + ' ' + str(data['roomid']) , file=sys.stderr)
+    print('Flip card ' + str(data['row']) + ' ' + str(data['col']) + ' ' +  str(data['roomid']) , file=sys.stderr)
+    room = data['roomid']
+    row = data['row']
+    col = data['col']
+    GM = CHANNELS[room]
+    print(GM.word_board,file=sys.stderr)
+    print(GM.state_board,file=sys.stderr)
+    action = GM.flipCard(row,col)
+    emit('flip card',{'row': row, 'col': col, 'action':action}, room=room, include_self=False)
 
 
 @socketio.on('connect',namespace='/test')

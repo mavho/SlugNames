@@ -1,6 +1,5 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 
-
 socket.on('create room', function(msg){
     console.log(msg);
     $.ajax({
