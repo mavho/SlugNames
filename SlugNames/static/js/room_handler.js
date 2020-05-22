@@ -1,11 +1,12 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 var user_name = "";
 var team = "";
+var role = "";
 
 socket.on('create room', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
-    console.log(msg);
+    // console.log(msg);
     allusers = msg['allusers'];
     createUsersList(allusers);
     var startButton = $('<button/>').text('Start the game').click(function () { 
@@ -32,8 +33,8 @@ socket.on('join theroom', function(msg){
 function createUsersList(allusers){
     $("#users_list").empty();
     for (var i = 0; i < allusers.length; i++) {
-        console.log("User " + i + "found.");
-        console.log(allusers[i]);
+        // console.log("User " + i + "found.");
+        // console.log(allusers[i]);
         var aUser = $('<li class="list-group-item"/>');
         aUser.innerHTML = allusers[i];
         $("#users_list").append(allusers[i]); //show all users on the page 
@@ -42,6 +43,16 @@ function createUsersList(allusers){
 }
 
 socket.on('start game', function(msg) {
+    if (msg['spy'] == 'true'){
+        console.log('You are a spymaster on team ' + msg['team']);
+        role = "spymaster";
+        team = msg['team']
+    }
+    else{
+        console.log('You are an agent on team ' + msg['team']);
+        role = "agent";
+        team = msg['team']
+    }
     $.ajax({
         url: msg['url']}).done(function(reply){
             $('#container').html(reply);

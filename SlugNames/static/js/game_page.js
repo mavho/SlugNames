@@ -8,7 +8,7 @@ It also will obtain info and send info to the webservice
 var board_len = 5;
 var board_width = 5;
 
-console.log(user_name);
+console.log(user_name + ' ' + team + ' ' + role);
 console.log(roomid);
 $(document).ready(function() {
     console.log("Game page!");
