@@ -81,5 +81,5 @@ class RoomMaster():
         if (row,col) in self.flippedCards_set:
             print("already flipped before", file=sys.stderr)
             return('','')
-            
+        # update the game state
         return (self.state_board[row][col], self.word_board[row][col])
