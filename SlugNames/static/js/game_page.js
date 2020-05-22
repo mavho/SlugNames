@@ -5,17 +5,29 @@ game UI
 It also will obtain info and send info to the webservice
 */
 
+var board_len = 5;
+var board_width = 5;
+console.log(roomid);
 $(document).ready(function() {
     console.log("Game page!");
     var thewords = $(".test");
-    for(var i = 0; i < thewords.length; i++) {
-        thewords[i].addEventListener("click", bindClick(i));
+    console.log(thewords);
+
+    for(let r=0; r < board_len; r++){
+        for(let c= 0; c<board_width; c++){
+            thewords[(r*board_len)+c].addEventListener("click", bindClick(r,c));
+        }
     }
  
-    function bindClick(i) {
+    function bindClick(row, col) {
         return function() {
-            console.log("this number was clicked:  " + i);
-            socket.emit("flip card", {'card': i,  'roomid': roomid });
+            console.log("row" + row + " :column " + col);
+            socket.emit("flip card", {'row': row, 'col':col, 'roomid': roomid });
         };
     }
+});
+
+
+socket.on('flip card', function(msg){
+    console.log(msg);
 });

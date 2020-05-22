@@ -1,8 +1,8 @@
 {% extends "_includes/base.html" %}
 
 {% block content %}
-<h6>ROOM: {{ roomid }} </h6>
-    <table id="mydiv" class="table">
+<h6>GAME PAGE {{ roomid }}</h6>
+    <table id="word_table" class="table">
         <thead>
             <tr>
                 <th scope="col"></th>
@@ -13,9 +13,15 @@
         </thead>
         <tbody>
         {% for row in thenames %}
-            <tr>
+            <tr >
             {% for names in row %}
-                <td class="test"> <button type="button" class="btn btn-primary"> {{ names }} </button></td>
+                <td class="test">
+                    <div class="card cell">
+                        <span class="card-body cell">
+                        {{ names }}
+                        </span>
+                     </div>
+                </td>
             {% endfor %}
             </tr>
         </tbody>
