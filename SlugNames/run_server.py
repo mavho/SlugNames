@@ -3,7 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_socketio import SocketIO, emit,join_room,leave_room
 from RoomMaster import RoomMaster
 from config import Config
-import os,sys
+import os,sys, random
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -82,7 +82,22 @@ def start_game(data):
     GM = CHANNELS[room]
     if( (len(GM.users) < 4) and (data['hardStart'] == 'false') ):
         print("Need at least 4 users", file=sys.stderr)
-        return    
+        return
+        
+    #putting the users into teams 
+    for index, user in enumerate(GM.users): 
+        if(index % 2) == 0:
+            GM.team_red.append(user)
+        else:
+            GM.team_blue.append(user)
+    #selecting spymaster amongst the teams
+    spyred = random.randrange(0, len(GM.team_red))
+    spyblue = random.randrange(0, len(GM.team_blue))
+    GM.spymasters.append(GM.team_red[spyred])
+    GM.spymasters.append(GM.team_blue[spyblue])
+    print('Chumps on team red: ' + str(GM.team_red))
+    print('Chumps on team blue: ' + str(GM.team_blue))
+    print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
     print("Starting game for room: " + room, file=sys.stderr)
     emit('start game', {'url': url}, room=room)

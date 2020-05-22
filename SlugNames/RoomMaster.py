@@ -20,6 +20,9 @@ class RoomMaster():
             'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2']
 
         self.flippedCards_set = set()
+        self.team_red = []
+        self.team_blue = []
+        self.spymasters = [] #first spymaster is red's, second is blue's 
         self.red_agent_count = 8
         self.blue_agent_count = 8
         self.double_agent_count = 1 
