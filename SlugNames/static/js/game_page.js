@@ -15,6 +15,7 @@ $(document).ready(function() {
     for(let r=0; r < board_len; r++){
         for(let c= 0; c<board_width; c++){
             thewords[(r*board_len)+c].addEventListener("click", bindClick(r,c));
+            //attach a specific id to each button 
             thewords[(r*board_len)+c].setAttribute("id", r + '-' + c);
         }
     }
@@ -24,7 +25,7 @@ $(document).ready(function() {
             if(role != 'spymaster'){
                 console.log("row" + row + " :column " + col);
                 socket.emit("flip card", {'row': row, 'col':col, 'roomid': roomid, 'username':user_name});
-                $('#' + row + '-' + c).append('clicked');
+                // grab the clicked item this way: $('#' + row + '-' + col).append('clicked');
             }
         };
     }
