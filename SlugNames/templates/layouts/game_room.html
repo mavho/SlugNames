@@ -12,16 +12,46 @@
                 </tr>
         </thead>
         <tbody>
-        {% for row in thenames %}
+        {% for i in range(5) %}
             <tr>
-            {% for names in row %}
-                <td class="test">
-                    <div class="card cell">
-                        <span class="card-body cell">
-                        {{ names }}
-                        </span>
-                     </div>
-                </td>
+            {% for n in range(5) %}
+                {% if boardstate %}
+                    <td class="test">
+                        {% if boardstate[i][n] == 'B' %}
+                        <div class="card cell bg-primary">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% elif boardstate[i][n] == 'R' %}
+                        <div class="card cell bg-danger">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% elif boardstate[i][n] == 'A' %}
+                        <div class="card cell bg-warning">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% else %}
+                            <div class="card cell">
+                                <span class="card-body cell">
+                                {{ thenames[i][n] }} 
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                {% else %}
+                    <td class="test">
+                        <div class="card cell">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }}
+                            </span>
+                        </div>
+                    </td>
+                {% endif %}
             {% endfor %}
             </tr>
         </tbody>
