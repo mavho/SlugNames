@@ -2,6 +2,7 @@ var socket = io.connect('http://' + document.domain + ':' + location.port + '/te
 var user_name = "";
 var team = "";
 var role = "";
+var room_name = "";
 
 socket.on('create room', function(msg){
     $("#join_room").hide();
@@ -16,8 +17,8 @@ socket.on('create room', function(msg){
     var startButton2 = $('<button/>').text('HARD START').click(function () { 
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'true'});
     });
-    $("#start_shit").append(startButton); 
-    $("#start_shit").append(startButton2); //startButton2 just makes it so you dont need 4 players, for debugging
+    $("#start_btnsection").append(startButton); 
+    $("#start_btnsection").append(startButton2); //startButton2 just makes it so you dont need 4 players, for debugging
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
 
@@ -43,21 +44,30 @@ function createUsersList(allusers){
 }
 
 socket.on('start game', function(msg) {
+    var theurl = msg['url'];
+    console.log('The url ');
+    console.log(msg['url']);
     if (msg['spy'] == 'true'){
         console.log('You are a spymaster on team ' + msg['team']);
         role = "spymaster";
         team = msg['team']
+        theurl = '/spygame/' + room_name;
     }
     else{
-        console.log('You are an agent on team ' + msg['team']);
+        console.log('You are a agent on team ' + msg['team']);
         role = "agent";
         team = msg['team']
     }
     $.ajax({
-        url: msg['url']}).done(function(reply){
+        url: theurl, 
+        // url: theurl, 
+        }).done(function(reply){
             $('#container').html(reply);
+            $('#maintitle').append("Player: " + user_name);
+            $('#maintitle').append(" Team: " + team);
+            $('#maintitle').append(" Role: " + role);
     });
-})
+});
 
 document.querySelector("#create_room").addEventListener("click", () =>{
     console.log('create room');

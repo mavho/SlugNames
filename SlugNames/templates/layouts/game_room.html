@@ -1,7 +1,7 @@
 {% extends "_includes/base.html" %}
 
 {% block content %}
-<h6>GAME PAGE {{ roomid }}</h6>
+<h6 id="maintitle">GAME PAGE {{ roomid }} </h6>
     <table id="word_table" class="table">
         <thead>
             <tr>
@@ -13,7 +13,7 @@
         </thead>
         <tbody>
         {% for row in thenames %}
-            <tr >
+            <tr>
             {% for names in row %}
                 <td class="test">
                     <div class="card cell">
@@ -27,6 +27,34 @@
         </tbody>
         {% endfor %}
     </table>
+
+    {% if boardstate %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in boardstate %}
+            <tr>
+            {% for state in row %}
+                <td>
+                    <div class="card cell">
+                        <span class="card-body cell">
+                        {{ state }}
+                        </span>
+                     </div>
+                </td>
+            {% endfor %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    {% endif %}
             
 {% endblock %}
 <!--Include DOM objects here.Should be UI of the game-->
