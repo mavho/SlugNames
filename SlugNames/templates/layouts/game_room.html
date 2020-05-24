@@ -1,7 +1,8 @@
 {% extends "_includes/base.html" %}
 
 {% block content %}
-<h6>GAME PAGE {{ roomid }}</h6>
+    <h6>GAME PAGE {{ roomid }}</h6>
+    <h6 id="debug"></h6>
     <table id="word_table" class="table">
         <thead>
             <tr>
@@ -27,6 +28,19 @@
         </tbody>
         {% endfor %}
     </table>
+    <div class="input-group mb-3" id="clue_cont">
+        <input id="clue_input" type="text" class="form-control" placeholder="clue word">
+        <input id="card_amt_input" type="text" class="form-control" placeholder="card amount" >
+
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="send_clue_btn">clue</button>
+        </div>
+    </div>
+
+    <div id="send_cell_cont">
+        <button class="btn btn-outline-secondary" type="button" id="send_cells_btn">clue</button>
+    </div>
+
             
 {% endblock %}
 <!--Include DOM objects here.Should be UI of the game-->

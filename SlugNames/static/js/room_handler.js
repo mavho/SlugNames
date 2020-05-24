@@ -1,8 +1,24 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+/**
+ * These vars are not meant to be altered, treat them as static
+ */
 var user_name = "";
 var team = "";
 var role = "";
+/**
+ * These vars are meant to be altered
+ */
+var cardQ = [];
+var cardQ_len = 0;;
+var clue_word = "";
+/**
+ * Turn can only be one of two values. R or B
+ */
+var turn = "";
 
+/**
+ * Called upon creating a room
+ */
 socket.on('create room', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
@@ -21,7 +37,9 @@ socket.on('create room', function(msg){
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
 
-//again tons of duplicate code, can def refactor lol...
+/**
+ * Called upon joining a room
+ */
 socket.on('join theroom', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
@@ -42,6 +60,9 @@ function createUsersList(allusers){
     }
 }
 
+/**
+ * This is called upon the room creator starting the game. Roles are defined.
+ */
 socket.on('start game', function(msg) {
     if (msg['spy'] == 'true'){
         console.log('You are a spymaster on team ' + msg['team']);
@@ -53,9 +74,12 @@ socket.on('start game', function(msg) {
         role = "agent";
         team = msg['team']
     }
+    let turn = "start";
     $.ajax({
         url: msg['url']}).done(function(reply){
             $('#container').html(reply);
+            //This essentially starts the game!
+            socket.emit("spy turn", {'turn':turn, 'roomid':roomid});
     });
 })
 

@@ -33,6 +33,7 @@ class RoomMaster():
         self.state_board = self._generateStateBoard()
         self.users = [] #a list of all the usernames in the room 
         self.usersid = {}  #usersid is a dictionary where username maps to their corresponding sid 
+        self.current_turn = 'blue' # this should either be blue or red. We start with B to make B always go first.
 
 
     def changeWordBoard(self):

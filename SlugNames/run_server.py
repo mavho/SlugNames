@@ -107,14 +107,46 @@ def start_game(data):
     print(str(GM.usersid))
     for user in GM.team_red:
         if user in GM.spymasters:
-            emit('start game', {'url': url, 'spy': 'true', 'team': 'red'}, room=GM.usersid[user])
+            emit('start game', {'url': url, 'spy': 'true', 'team': 'red', 'turn': GM.current_turn}, room=GM.usersid[user])
         else:
-            emit('start game', {'url': url, 'spy' : 'false', 'team': 'red'}, room=GM.usersid[user])
+            emit('start game', {'url': url, 'spy' : 'false', 'team': 'red', 'turn': GM.current_turn}, room=GM.usersid[user])
     for user in GM.team_blue:
         if user in GM.spymasters: 
-            emit('start game', {'url': url, 'spy': 'true', 'team': 'blue'}, room=GM.usersid[user])
+            emit('start game', {'url': url, 'spy': 'true', 'team': 'blue', 'turn': GM.current_turn}, room=GM.usersid[user])
         else:
-            emit('start game', {'url': url, 'spy' : 'false', 'team': 'blue'}, room=GM.usersid[user])
+            emit('start game', {'url': url, 'spy' : 'false', 'team': 'blue', 'turn': GM.current_turn}, room=GM.usersid[user])
+
+
+### the spy turn has started.
+@socketio.on('spy turn',namespace='/test')
+def spy_phase(data):
+    room = data['roomid']
+    turn = data['turn']
+    GM = CHANNELS.get(room)
+    print(data,file=sys.stderr)
+    if GM is None:
+        print("Handle error")
+    if turn == "start":
+        emit('spy turn', {'turn': 'blue'}, room=room)
+    
+    #### TODO: Action handler. We have to evaluate the cells they send us.
+    else:
+        GM.current_turn = 'blue' if turn == 'red' else 'red' 
+        ### TODO: timer
+        emit('spy turn', {'turn':GM.current_turn}, room=room)
+
+@socketio.on('agent turn',namespace='/test')
+def agent_turn(data):
+    print('Agent turn broadcast',file=sys.stderr)
+    room=data['roomid']
+    clue = data['clue']
+    amt = data['amt']
+    GM = CHANNELS.get(room)
+    if GM is None:
+        print("Handle error")
+
+    emit('agent turn', {'turn': GM.current_turn, 'clue':clue, 'amt':amt}, room=room)
+
 
 @socketio.on('flip card', namespace='/test')
 def flip_card(data):
