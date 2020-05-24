@@ -122,6 +122,10 @@ def start_game(data):
 ### the spy turn has started.
 @socketio.on('spy turn',namespace='/test')
 def spy_phase(data):
+    """
+    TODO: Action handler. We have to evaluate the cells they send us.
+    given special turn start, turn will be blue. Only invoked at start
+    """
     room = data['roomid']
     turn = data['turn']
     GM = CHANNELS.get(room)
@@ -131,10 +135,7 @@ def spy_phase(data):
     if turn == "start":
         emit('spy turn', {'turn': 'blue'}, room=room)
     
-    #### TODO: Action handler. We have to evaluate the cells they send us.
     else:
-        GM.current_turn = 'blue' if turn == 'red' else 'red' 
-        ### TODO: timer
         emit('spy turn', {'turn':GM.current_turn}, room=room)
 
 ### signals start of agent turn, broadcast it
@@ -154,21 +155,31 @@ def agent_turn(data):
 @socketio.on('flip card', namespace='/test')
 def flip_card(data):
     """
-    An example url that handles some event. 
-    TODO: Client side needs to access this somehow
-    access a card Q and send back an action
+    Agents send their cardQ to this route.
+    Once all agents have sent their cardQ,
+    the server will emit out spy turn, signalling
+    start of the next spy turn
+
+    TODO: timer implementation
+    also actions
     """
     # data should have room name or something
-    print('Flip card ' + str(data['row']) + ' ' + str(data['col']) + ' ' +  str(data['roomid'] + ' ' + str(data['username'])) , file=sys.stderr)
+    print(data['cards'],file=sys.stderr)
     room = data['roomid']
-    row = data['row']
-    col = data['col']
-    username = data['username']
+    cur_turn = data['turn']
+    cards = data['cards']
     GM = CHANNELS[room]
-    action = GM.flipCard(row,col,username)
-    print(GM.red_agent_count, file=sys.stderr)
-    print(GM.blue_agent_count, file=sys.stderr)
-    emit('flip card',{'row': row, 'col': col, 'action':action,'user':username}, room=room, include_self=False)
+    GM.senders += 1
+    if GM.determineAction(cards,cur_turn) != 'OK':
+        return
+
+    print('Send emit to spy turn', file=sys.stderr)
+    ## TODO: here is where we determine the action  switch turns etc.
+    new_turn = 'blue' if cur_turn =='red' else 'red'
+    GM.current_turn = new_turn
+    # reset senders
+    GM.senders = 0
+    emit('spy turn',{'turn':new_turn,'roomid':room}, room=room)
 
 
 @socketio.on('connect',namespace='/test')
@@ -179,7 +190,6 @@ def test_connect():
 @socketio.on('disconnect',namespace='/test')
 def test_disconnect():
     print('This guy disconnected: ' + request.sid, file=sys.stderr)
-    print('Client disconnected', file=sys.stderr)
 
 
 if __name__ == '__main__':

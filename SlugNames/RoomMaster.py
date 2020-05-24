@@ -34,6 +34,7 @@ class RoomMaster():
         self.users = [] #a list of all the usernames in the room 
         self.usersid = {}  #usersid is a dictionary where username maps to their corresponding sid 
         self.current_turn = 'blue' # this should either be blue or red. We start with B to make B always go first.
+        self.senders = 0 # represents the number of people who sent cards. We might not need it since we'll implement a timer 
 
 
     def changeWordBoard(self):
@@ -78,10 +79,17 @@ class RoomMaster():
                 res[i][n] = hold[i*5 + n]
         return res
 
-    def flipCard(self, row,col, username):
+    def determineAction(self, cardQ, turn):
         """
         Returns a tuple, (state,word) if successful.
         On duplicate cards returns a tuple with empty strings
+        """
+        if turn == 'blue' and self.senders != (len(self.team_blue) - 1):
+            print("Not time to emit back anything",file=sys.stderr)
+            return 'error'
+        elif turn == 'red' and self.senders != (len(self.team_red) - 1):
+            print("Not time to emit back anything",file=sys.stderr)
+            return 'error'
         """
         if (row,col) in self.flippedCards_set:
             print("already flipped before", file=sys.stderr)
@@ -91,11 +99,13 @@ class RoomMaster():
         self.flippedCards_set.add((row,col))
          
         if flipped_card != 'A' or flipped_card != 'I':
-            self._decrement(flipped_card,username)
+            self._decrement(flipped_card)
 
         return (self.state_board[row][col], self.word_board[row][col])
+        """
+        return 'OK'
 
-    def _decrement(self, card, username):
+    def _decrement(self, card):
         if card == 'B':
             self.blue_agent_count -= 1
         elif card == 'R':

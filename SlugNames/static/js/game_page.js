@@ -21,10 +21,17 @@ $(document).ready(function() {
     }
     function bindClick(row, col) {
         return function() {
-            if(role != 'spymaster'){
-                console.log("row" + row + " :column " + col);
-                socket.emit("flip card", {'row': row, 'col':col, 'roomid': roomid, 'username':user_name});
-                // grab the clicked item this way: $('#' + row + '-' + col).append('clicked');
+            if(role != 'spymaster' && agent_turn){
+                let tostr = row + "" + col;
+                let tab_rc = $("#" + row + '-'+col);
+                // remove duplicate row col 
+                if(tostr in cardQ){
+                    delete cardQ[tostr];
+                    tab_rc.css('border-color','grey');
+                }else if (Object.keys(cardQ).length < cardQ_len){
+                    cardQ[tostr] = {'row':row,'col':col};
+                    tab_rc.css('border-color','green');
+                }
             }
         };
     }
@@ -44,9 +51,7 @@ $(document).ready(function() {
 
     //TODO: do cell selection
     $("#send_cells_btn").click(function(){
-        console.log("hello?")
-        socket.emit("spy turn", {'roomid':roomid, 'turn':team});
-        agent_turn = false;
+        attemptAgentEmit();
     });
     /**
      * Hides divs not needed by current role
@@ -60,7 +65,6 @@ $(document).ready(function() {
     }
 });
 
-//Signals if this is your turn or not.
 /**
  * spy_turn is true if role is spymaster and cur team's turn
  * agent_turn is true if role is agent and cur team's turn
@@ -83,7 +87,7 @@ socket.on('agent turn', function(msg){
     cardQ_len = msg['amt']
     clue_word = msg['clue']
     if(team == msg['turn'] && role=="agent"){
-        console.log("agent turn");
+        console.log("It is " + msg['turn'] + " agent turn")
         agent_turn = true;
     }
     $("#debug").html(user_name + ' ' + team + ' ' + role
@@ -91,15 +95,25 @@ socket.on('agent turn', function(msg){
 });
 
 // This needs to handle receiving  a card event from someone.
+// TODO: error checking or something
 socket.on('flip card', function(msg){
     console.log(msg);
 });
 
 // Wrapper for emit, check if you have permissions to emit.
+// emits and ends spy turn
 function attemptSpyEmit(clue,amt){
     if (spy_turn){
         socket.emit("agent turn",{'clue':clue,'amt':amt,'roomid':roomid});
         spy_turn = false;
+    }
+}
+
+//We set agent turn to false once they send to prevent them from sending multiple, even thought the next phase hasn't started
+function attemptAgentEmit(){
+    if(agent_turn){
+        socket.emit("flip card", {'roomid':roomid, 'turn':team, 'cards':cardQ});
+        agent_turn = false;
     }
 }
 

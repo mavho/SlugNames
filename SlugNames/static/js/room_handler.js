@@ -8,7 +8,7 @@ var role = "";
 /**
  * These vars are meant to be altered
  */
-var cardQ = [];
+var cardQ = {};
 var cardQ_len = 0;;
 var clue_word = "";
 /**
