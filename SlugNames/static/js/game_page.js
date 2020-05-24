@@ -7,9 +7,7 @@ It also will obtain info and send info to the webservice
 
 var board_len = 5;
 var board_width = 5;
-
-console.log(user_name + ' ' + team + ' ' + role);
-console.log(roomid);
+console.log(user_name + ' ' + team + ' ' + role + ' ' + roomid);
 /// load onclick handlers
 $(document).ready(function() {
     console.log("Game page!");
@@ -17,13 +15,17 @@ $(document).ready(function() {
     for(let r=0; r < board_len; r++){
         for(let c= 0; c<board_width; c++){
             thewords[(r*board_len)+c].addEventListener("click", bindClick(r,c));
+            //attach a specific id to each button 
+            thewords[(r*board_len)+c].setAttribute("id", r + '-' + c);
         }
     }
- 
     function bindClick(row, col) {
         return function() {
-            console.log("row" + row + " :column " + col);
-            socket.emit("flip card", {'row': row, 'col':col, 'roomid': roomid, 'username':user_name});
+            if(role != 'spymaster'){
+                console.log("row" + row + " :column " + col);
+                socket.emit("flip card", {'row': row, 'col':col, 'roomid': roomid, 'username':user_name});
+                // grab the clicked item this way: $('#' + row + '-' + col).append('clicked');
+            }
         };
     }
     /*
@@ -46,11 +48,8 @@ $(document).ready(function() {
         socket.emit("spy turn", {'roomid':roomid, 'turn':team});
         agent_turn = false;
     });
-
-
-
     /**
-     * Hides clue container if not the spy master
+     * Hides divs not needed by current role
      */
     if(!isSpyMaster()){
         $("#clue_cont").hide();
@@ -61,13 +60,16 @@ $(document).ready(function() {
     }
 });
 
+//Signals if this is your turn or not.
+/**
+ * spy_turn is true if role is spymaster and cur team's turn
+ * agent_turn is true if role is agent and cur team's turn
+ */
 var spy_turn = false;
 var agent_turn = false;
 
+//Signals start of spy turn
 socket.on('spy turn', function(msg){
-    console.log("spymaster handler");
-    console.log(msg);
-    console.log(msg['turn'] + ' ' + team);
     if(role == "spymaster" && team == msg['turn']){
         console.log("It is " + msg['turn'] + " spymaster turn")
         spy_turn = true;
@@ -78,11 +80,8 @@ socket.on('spy turn', function(msg){
 
 //This signals the start of agent turn
 socket.on('agent turn', function(msg){
-    console.log("agent handler");
-    console.log(msg);
     cardQ_len = msg['amt']
     clue_word = msg['clue']
-
     if(team == msg['turn'] && role=="agent"){
         console.log("agent turn");
         agent_turn = true;

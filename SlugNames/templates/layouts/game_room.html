@@ -1,7 +1,7 @@
 {% extends "_includes/base.html" %}
 
 {% block content %}
-    <h6>GAME PAGE {{ roomid }}</h6>
+    <h6 id="maintitle">GAME PAGE {{ roomid }} </h6>
     <h6 id="debug"></h6>
     <table id="word_table" class="table">
         <thead>
@@ -13,13 +13,70 @@
                 </tr>
         </thead>
         <tbody>
-        {% for row in thenames %}
-            <tr >
-            {% for names in row %}
-                <td class="test">
+        {% for i in range(5) %}
+            <tr>
+            {% for n in range(5) %}
+                {% if boardstate %}
+                    <td class="test">
+                        {% if boardstate[i][n] == 'B' %}
+                        <div class="card cell bg-primary">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% elif boardstate[i][n] == 'R' %}
+                        <div class="card cell bg-danger">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% elif boardstate[i][n] == 'A' %}
+                        <div class="card cell bg-warning">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }} 
+                            </span>
+                        </div>
+                        {% else %}
+                            <div class="card cell">
+                                <span class="card-body cell">
+                                {{ thenames[i][n] }} 
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                {% else %}
+                    <td class="test">
+                        <div class="card cell">
+                            <span class="card-body cell">
+                            {{ thenames[i][n] }}
+                            </span>
+                        </div>
+                    </td>
+                {% endif %}
+            {% endfor %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+
+    {% if boardstate %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in boardstate %}
+            <tr>
+            {% for state in row %}
+                <td>
                     <div class="card cell">
                         <span class="card-body cell">
-                        {{ names }}
+                        {{ state }}
                         </span>
                      </div>
                 </td>
@@ -28,6 +85,7 @@
         </tbody>
         {% endfor %}
     </table>
+    {% endif %}
     <div class="input-group mb-3" id="clue_cont">
         <input id="clue_input" type="text" class="form-control" placeholder="clue word">
         <input id="card_amt_input" type="text" class="form-control" placeholder="card amount" >

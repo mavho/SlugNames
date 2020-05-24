@@ -29,11 +29,11 @@ socket.on('create room', function(msg){
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'false'});
     });
 
-    var startButton2 = $('<button/>').text('HARD START').click(function () { 
+    var hardStart = $('<button/>').text('HARD START').click(function () { 
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'true'});
     });
-    $("#start_shit").append(startButton); 
-    $("#start_shit").append(startButton2); //startButton2 just makes it so you dont need 4 players, for debugging
+    $("#start_btnsection").append(startButton); 
+    $("#start_btnsection").append(hardStart); //startButton2 just makes it so you dont need 4 players, for debugging
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
 
@@ -43,7 +43,7 @@ socket.on('create room', function(msg){
 socket.on('join theroom', function(msg){
     $("#join_room").hide();
     $("#create_room").hide();
-    console.log(msg);
+    console.log('Join theroom ' + msg);
     allusers = msg['allusers'];
     createUsersList(allusers);
 });
@@ -64,24 +64,32 @@ function createUsersList(allusers){
  * This is called upon the room creator starting the game. Roles are defined.
  */
 socket.on('start game', function(msg) {
+    var theurl = msg['url'];
+    console.log('Start the game');
     if (msg['spy'] == 'true'){
         console.log('You are a spymaster on team ' + msg['team']);
         role = "spymaster";
         team = msg['team']
+        theurl = '/spygame/' + room_name;
     }
     else{
-        console.log('You are an agent on team ' + msg['team']);
+        console.log('You are a agent on team ' + msg['team']);
         role = "agent";
         team = msg['team']
     }
     let turn = "start";
     $.ajax({
-        url: msg['url']}).done(function(reply){
+        url: theurl, 
+        // url: theurl, 
+        }).done(function(reply){
             $('#container').html(reply);
             //This essentially starts the game!
             socket.emit("spy turn", {'turn':turn, 'roomid':roomid});
+            $('#maintitle').append("Player: " + user_name);
+            $('#maintitle').append(" Team: " + team);
+            $('#maintitle').append(" Role: " + role);
     });
-})
+});
 
 document.querySelector("#create_room").addEventListener("click", () =>{
     console.log('create room');

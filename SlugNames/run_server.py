@@ -22,10 +22,12 @@ def index():
 
 @app.route('/game/<roomid>', methods=['GET'])
 def theGame(roomid):
-    # print(CHANNELS[roomid].word_board, file=sys.stderr)
-    #thenames is a 5x5 2d list with the words for codenames 
-
     return render_template('layouts/game_room.html', thenames=CHANNELS[roomid].word_board, roomid=roomid)   #thenames=CHANNELS[roomid].word_board)
+
+#a really shitty way of doing it but idk
+@app.route('/spygame/<roomid>', methods=['GET'])
+def spyGame(roomid):
+    return render_template('layouts/game_room.html', thenames=CHANNELS[roomid].word_board, boardstate=CHANNELS[roomid].state_board, roomid=roomid)   #thenames=CHANNELS[roomid].word_board)
 
 
 #Host creates a room, and is able to start the game 
@@ -135,6 +137,7 @@ def spy_phase(data):
         ### TODO: timer
         emit('spy turn', {'turn':GM.current_turn}, room=room)
 
+### signals start of agent turn, broadcast it
 @socketio.on('agent turn',namespace='/test')
 def agent_turn(data):
     print('Agent turn broadcast',file=sys.stderr)
@@ -153,6 +156,7 @@ def flip_card(data):
     """
     An example url that handles some event. 
     TODO: Client side needs to access this somehow
+    access a card Q and send back an action
     """
     # data should have room name or something
     print('Flip card ' + str(data['row']) + ' ' + str(data['col']) + ' ' +  str(data['roomid'] + ' ' + str(data['username'])) , file=sys.stderr)
