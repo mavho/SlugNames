@@ -20,19 +20,22 @@ var turn = "";
  * Called upon creating a room
  */
 socket.on('create room', function(msg){
-    $("#join_room").hide();
-    $("#create_room").hide();
+    hideButtons();
     // console.log(msg);
     allusers = msg['allusers'];
     createUsersList(allusers);
-    var startButton = $('<button/>').text('Start the game').click(function () { 
+    var startButton = $('<button type="button" class="btn btn-primary"/>').text('Start the game');
+    // startButton.classList.add('btn-primary');
+    startButton.click(function () { 
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'false'});
     });
 
-    var hardStart = $('<button/>').text('HARD START').click(function () { 
+    var hardStart = $('<button type="button" class="btn btn-primary"/>').text('HARD START'); 
+    hardStart.click(function () { 
         socket.emit("start game", {'room': msg['room'], 'hardStart': 'true'});
     });
     $("#start_btnsection").append(startButton); 
+    $("#start_btnsection").append("</br> <br>");
     $("#start_btnsection").append(hardStart); //startButton2 just makes it so you dont need 4 players, for debugging
     // $("#users_list").append({"class": "list-group-item", "innerHTML" : "a user"});
 });
@@ -41,8 +44,7 @@ socket.on('create room', function(msg){
  * Called upon joining a room
  */
 socket.on('join theroom', function(msg){
-    $("#join_room").hide();
-    $("#create_room").hide();
+    hideButtons();
     console.log('Join theroom ' + msg);
     allusers = msg['allusers'];
     createUsersList(allusers);
@@ -50,14 +52,29 @@ socket.on('join theroom', function(msg){
 
 function createUsersList(allusers){
     $("#users_list").empty();
+    var aheading= $('<h3/>').text("Players:");
+    $("#users_list").append(aheading);
     for (var i = 0; i < allusers.length; i++) {
         // console.log("User " + i + "found.");
         // console.log(allusers[i]);
-        var aUser = $('<li class="list-group-item"/>');
-        aUser.innerHTML = allusers[i];
-        $("#users_list").append(allusers[i]); //show all users on the page 
+        // var aUser = $('<li class="list-group-item"/>').text(allusers[i]);
+        if(allusers[i] == user_name){
+            var aUser = $('<li class="list-group-item list-group-item-info"/>').text(allusers[i]);
+        }
+        else{
+            var aUser = $('<li class="list-group-item"/>').text(allusers[i]);
+        }
+        // aUser.innerHTML = allusers[i];
+        //$("#users_list").append(allusers[i]); //show all users on the page 
+        $("#users_list").append(aUser);
         $("#users_list").append("<br>");
     }
+}
+
+function hideButtons(){
+    $("#join_room").hide();
+    $("#create_room").hide();
+    $("#startButtons").hide();
 }
 
 /**

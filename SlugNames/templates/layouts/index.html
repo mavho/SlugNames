@@ -1,7 +1,7 @@
 {% extends "_includes/base.html" %}
 
 {% block navbar %}
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default navbar-light bg-light">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -15,20 +15,31 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="">Home</a></li>
-                    <li><a href="">placeholder</a></li>
+                    <li><a href="">FAQ</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="">Login</a></li>
+                    <li><a href="">Other</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 {% endblock %}
 {% block app_content %}
-<div class="control">
+<!-- <div class="control">
     <input id="room_input" class="input" type="text" placeholder="Room Name"> </input>
     <input id="username_input" class="input" type="text" placeholder="UserName"> </input>
-</div>
+</div> -->
+
+<form id="startButtons"> 
+    <div class="form-group">
+        <label for="room_input">Room ID</label>
+        <input class="input form-control" type="text" id="room_input" placeholder="Enter Room ID"> 
+    </div>
+    <div class="form-group">
+        <label for="username_input">Username</label>
+        <input class="input form-control" type="text" id="username_input" placeholder="Enter username">
+    </div>
+</form>
 
 <ul class="list-group" id="users_list">
 </ul>

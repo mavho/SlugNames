@@ -104,7 +104,6 @@ def start_game(data):
     print('Chumps on team blue: ' + str(GM.team_blue))
     print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
-    print("Starting game for room: " + room, file=sys.stderr)
     print('Dictionaries: ')
     print(str(GM.usersid))
     for user in GM.team_red:
