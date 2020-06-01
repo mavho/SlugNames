@@ -34,7 +34,7 @@ $(document).ready(function() {
                 }
             }
         };
-    }
+    } 
     /*
     On click handlers for sending stuff. For debugging
     */
@@ -74,8 +74,33 @@ var agent_turn = false;
 
 //Signals start of spy turn
 socket.on('spy turn', function(msg){
+    if("colorCoding" in msg){
+        for (var key in msg['colorCoding']){
+            let number = parseInt(key);
+            row = Math.floor(number/10);
+            row = row.toString();
+            col = number % 10;
+            col = col.toString();
+            console.log('Colors: row: ' + row + ' col: ' + col + ' ' + msg['colorCoding'][key]);
+            let tab_rc = $("#" + row + '-'+col);
+            if(msg['colorCoding'][key] == 'R'){
+                tab_rc.css('border-color','red');
+            }
+            else if(msg['colorCoding'][key] == 'B'){
+                tab_rc.css('border-color','blue');
+            }
+            else if(msg['colorCoding'][key] == 'I'){
+                tab_rc.css('border-color', 'white');
+            }
+            else{
+                tab_rc.css('border-color', 'black');
+                console.log('Brah i think you lost!');
+            }
+        }
+
+    }
     if(role == "spymaster" && team == msg['turn']){
-        console.log("It is " + msg['turn'] + " spymaster turn")
+        console.log("It is " + msg['turn'] + " spymaster turn");
         spy_turn = true;
     }
     $("#debug").html(user_name + ' ' + team + ' ' + role
@@ -87,7 +112,7 @@ socket.on('agent turn', function(msg){
     cardQ_len = msg['amt']
     clue_word = msg['clue']
     if(team == msg['turn'] && role=="agent"){
-        console.log("It is " + msg['turn'] + " agent turn")
+        console.log("It is " + msg['turn'] + " agent's turn");
         agent_turn = true;
     }
     $("#debug").html(user_name + ' ' + team + ' ' + role
@@ -128,5 +153,5 @@ function checkInput(clue, amt){
     if(clue == '' || isNaN(amt) || amt == ''){
         return false;
     }
-    return true
+    return true;
 }

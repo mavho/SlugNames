@@ -65,7 +65,6 @@ function createUsersList(allusers){
             var aUser = $('<li class="list-group-item"/>').text(allusers[i]);
         }
         // aUser.innerHTML = allusers[i];
-        //$("#users_list").append(allusers[i]); //show all users on the page 
         $("#users_list").append(aUser);
         $("#users_list").append("<br>");
     }

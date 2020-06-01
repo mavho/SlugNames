@@ -132,6 +132,7 @@ def spy_phase(data):
     if GM is None:
         print("Handle error")
     if turn == "start":
+        print("Emitting start of game, for turn blue", file=sys.stderr)
         emit('spy turn', {'turn': 'blue'}, room=room)
     
     else:
@@ -163,6 +164,7 @@ def flip_card(data):
     also actions
     """
     # data should have room name or something
+    print('data in cards: ', end='', file=sys.stderr)
     print(data['cards'],file=sys.stderr)
     room = data['roomid']
     cur_turn = data['turn']
@@ -173,12 +175,17 @@ def flip_card(data):
         return
 
     print('Send emit to spy turn', file=sys.stderr)
+    colorCoding = {} 
+    for card in cards: 
+        row = int(cards[card]['row'])
+        col = int(cards[card]['col'])
+        colorCoding[card] = GM.state_board[row][col]
     ## TODO: here is where we determine the action  switch turns etc.
     new_turn = 'blue' if cur_turn =='red' else 'red'
     GM.current_turn = new_turn
     # reset senders
     GM.senders = 0
-    emit('spy turn',{'turn':new_turn,'roomid':room}, room=room)
+    emit('spy turn',{'turn':new_turn,'roomid':room, 'colorCoding':colorCoding}, room=room)
 
 
 @socketio.on('connect',namespace='/test')

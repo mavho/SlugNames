@@ -90,10 +90,14 @@ class RoomMaster():
         elif turn == 'red' and self.senders != (len(self.team_red) - 1):
             print("Not time to emit back anything",file=sys.stderr)
             return 'error'
-        """
-        if (row,col) in self.flippedCards_set:
-            print("already flipped before", file=sys.stderr)
-            return('','')
+        for keys in cardQ:
+            row = cardQ[keys]['row']
+            col = cardQ[keys]['col']
+            print('Printing row: ', file=sys.stderr)
+            print(str(row) + ' column: ' + str(col))        
+            if (row,col) in self.flippedCards_set:
+                print("already flipped before", file=sys.stderr)
+                return('','')
 
         flipped_card = self.state_board[row][col]
         self.flippedCards_set.add((row,col))
@@ -101,8 +105,8 @@ class RoomMaster():
         if flipped_card != 'A' or flipped_card != 'I':
             self._decrement(flipped_card)
 
-        return (self.state_board[row][col], self.word_board[row][col])
-        """
+        # return (self.state_board[row][col], self.word_board[row][col])
+
         return 'OK'
 
     def _decrement(self, card):
