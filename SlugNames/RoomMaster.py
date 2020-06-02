@@ -81,8 +81,9 @@ class RoomMaster():
 
     def determineAction(self, cardQ, turn):
         """
-        Returns a tuple, (state,word) if successful.
-        On duplicate cards returns a tuple with empty strings
+        CardQ is a dictionary indexed by "rowcol": and has 2 attr's row and col
+
+        TODO: send back an action. 
         """
         if turn == 'blue' and self.senders != (len(self.team_blue) - 1):
             print("Not time to emit back anything",file=sys.stderr)
