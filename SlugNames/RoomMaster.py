@@ -85,6 +85,8 @@ class RoomMaster():
         """
         determines if we go to the next phase 'determine action'
         puts cards into GM's cardQ
+
+        turn is either blue or red
         """
         #### we add it to the flipped cards
         for cards in cardQ:
@@ -112,21 +114,39 @@ class RoomMaster():
             row = int(card[0][0])
             col = int(card[0][1])
             flipped_card = self.state_board[row][col]
+            ### if not assasin decrement count. else ASSASSIN flag
             if flipped_card != 'A':
                 self._decrement(flipped_card)
             elif flipped_card == 'A':
                 return 'ASSASSIN'
 
+            print(turn,file=sys.stderr)
+            ### if the flipped card resulted in 0 agents that team wins!
+            if self.isAgentEmpty('blue'):
+                return 'BLUE'
+            elif self.isAgentEmpty('red'):
+                return 'RED'
+
+            ### keep track of the flipped cards
             cardstr= str(row) + '' + str(col)
             if cardstr not in self.flippedCards:
                 self.flippedCards[cardstr] = self.state_board[row][col]
             
-            print(self.isMatchingTurns(flipped_card),file=sys.stderr)
+            ### the card isn't matching switch sides 
             if not self.isMatchingTurns(flipped_card):
                 return 'SWITCH'
 
         return 'STAY'
 
+
+    def isAgentEmpty(self, team):
+        """
+        turn is either blue or red
+        """
+        if team == 'blue':
+            return self.blue_agent_count <= 0
+        elif team == 'red':
+            return self.red_agent_count <= 0
 
     def isMatchingTurns(self,fc_turn):
         if fc_turn == 'I':

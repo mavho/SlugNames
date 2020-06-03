@@ -88,7 +88,11 @@ socket.on('spy turn', function(msg){
     if(msg['end'] == true){
         $("#debug").html('GAME OVER ' + msg['turn'] + ' Loses');
         return;
+    }else if(msg['win'] != undefined && msg['win']['state'] == true){
+        $("#debug").html('GAME OVER ' + msg['win']['team'] + ' wins');
+        return;
     }
+
     updateCardColors(msg['flippedCards']);
 
     if(role == "spymaster" && team == msg['turn']){

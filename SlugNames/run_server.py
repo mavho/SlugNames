@@ -122,7 +122,7 @@ def start_game(data):
 @socketio.on('spy turn',namespace='/test')
 def spy_phase(data):
     """
-    TODO: Action handler. We have to evaluate the cells they send us.
+    Action handler. We have to evaluate the cells they send us.
     given special turn start, turn will be blue. Only invoked at start
     """
     room = data['roomid']
@@ -182,17 +182,24 @@ def flip_card(data):
 
     new_turn = cur_turn # var to store the turn
     end = False # flag to end the game
+    win = {'state':False,'team':''} 
 
     if ACTION == 'ASSASSIN':
         end=True
     elif ACTION == 'SWITCH':
         new_turn = 'blue' if cur_turn =='red' else 'red'
+    elif ACTION == 'BLUE':
+        win['state'] = True
+        win['team'] = 'blue'
+    elif ACTION=='RED':
+        win['state'] = True
+        win['team'] = 'red'
 
     GM.current_turn = new_turn
     # reset agent turn vars 
     GM.senders = 0
     GM.cardQ = {}
-    emit('spy turn',{'turn':new_turn,'roomid':room, 'flippedCards':GM.flippedCards, 'end':end}, room=room)
+    emit('spy turn',{'turn':new_turn,'roomid':room, 'flippedCards':GM.flippedCards, 'end':end,'win':win}, room=room)
 
 
 @socketio.on('connect',namespace='/test')
