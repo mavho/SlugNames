@@ -175,6 +175,6 @@ class RoomMaster():
         if ties, it's really up to how this sorted method works
         """ 
         res = []
-        res = sorted(self.cardQ.items(), key=lambda kv:kv[1])
+        res = sorted(self.cardQ.items(), key=lambda kv:kv[1],reverse=True)
 
         return res[:int(self.clue_amt)]

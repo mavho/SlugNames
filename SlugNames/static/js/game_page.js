@@ -33,7 +33,7 @@ $(document).ready(function() {
                 }
                 if(tostr in cardQ){
                     delete cardQ[tostr];
-                    tab_rc.css('border-color','white');
+                    tab_rc.css('border-color','#ddd');
                     tab_rc.css('background-color','white');
                 }else if (Object.keys(cardQ).length < cardQ_len){
                     cardQ[tostr] = {'row':row,'col':col};
@@ -163,16 +163,14 @@ function attemptSpyEmit(clue,amt){
 
 //We set agent turn to false once they send to prevent them from sending multiple, even thought the next phase hasn't started
 function attemptAgentEmit(){
-    console.log("ATTEMPTING EMIT");
     if(agent_turn){
-        console.log("ATTEMPTING EMIT");
         socket.emit("flip card", {'roomid':roomid, 'turn':team, 'cards':cardQ});
         agent_turn = false;
         //remove styling from the cardQ, then reset it
         for(let card of Object.keys(cardQ)){
             let rc = cardQ[card];
             let tab_rc = $("#" + rc['row'] + '-'+ rc['col']);
-            tab_rc.css('border-color','grey');
+            tab_rc.css('border-color','#ddd');
             tab_rc.css('background-color','white');
         }
         cardQ = {};

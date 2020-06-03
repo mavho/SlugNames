@@ -35,9 +35,6 @@ def spyGame(roomid):
 def create_room(data):
     """
     sends caller back a room master object and url
-    Wait no room master obj isn't seriliazable, we need to return stuff from it
-    The js files should build off that
-    This can be used either to join a create a room.
     """
     GM = RoomMaster()
     room = data['room']
@@ -163,7 +160,6 @@ def flip_card(data):
     start of the next spy turn
 
     TODO: timer implementation
-    also actions
     """
     # data should have room name or something
     print('data in cards: ', end='', file=sys.stderr)

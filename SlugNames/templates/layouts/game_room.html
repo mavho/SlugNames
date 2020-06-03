@@ -3,15 +3,7 @@
 {% block content %}
     <h6 id="maintitle">Room: {{ roomid }} </h6>
     <h6 id="debug"></h6>
-    <table id="word_table" class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
-                </tr>
-        </thead>
+    <table id="word_table" class="table table-bordered">
         <tbody>
         {% for i in range(5) %}
             <tr>
@@ -60,15 +52,7 @@
     </table>
 
     {% if boardstate %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
-            </tr>
-        </thead>
+    <table class="table table-bordered">
         <tbody>
         {% for row in boardstate %}
             <tr>
