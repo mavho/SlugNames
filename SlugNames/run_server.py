@@ -104,7 +104,6 @@ def start_game(data):
     print('Chumps on team blue: ' + str(GM.team_blue))
     print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
-    print("Starting game for room: " + room, file=sys.stderr)
     print('Dictionaries: ')
     print(str(GM.usersid))
     for user in GM.team_red:
@@ -133,6 +132,7 @@ def spy_phase(data):
     if GM is None:
         print("Handle error")
     if turn == "start":
+        print("Emitting start of game, for turn blue", file=sys.stderr)
         emit('spy turn', {'turn': 'blue'}, room=room)
     
     else:
@@ -145,7 +145,9 @@ def agent_turn(data):
     room=data['roomid']
     clue = data['clue']
     amt = data['amt']
+
     GM = CHANNELS.get(room)
+    GM.clue_amt = amt
     if GM is None:
         print("Handle error")
 
@@ -164,22 +166,33 @@ def flip_card(data):
     also actions
     """
     # data should have room name or something
+    print('data in cards: ', end='', file=sys.stderr)
     print(data['cards'],file=sys.stderr)
     room = data['roomid']
     cur_turn = data['turn']
     cards = data['cards']
     GM = CHANNELS[room]
     GM.senders += 1
-    if GM.determineAction(cards,cur_turn) != 'OK':
+    if GM.maxSenders(cards,cur_turn) != 'OK':
         return
 
     print('Send emit to spy turn', file=sys.stderr)
-    ## TODO: here is where we determine the action  switch turns etc.
-    new_turn = 'blue' if cur_turn =='red' else 'red'
+    
+    ACTION = GM.determineAction(cards,cur_turn)
+
+    new_turn = cur_turn # var to store the turn
+    end = False # flag to end the game
+
+    if ACTION == 'ASSASSIN':
+        end=True
+    elif ACTION == 'SWITCH':
+        new_turn = 'blue' if cur_turn =='red' else 'red'
+
     GM.current_turn = new_turn
-    # reset senders
+    # reset agent turn vars 
     GM.senders = 0
-    emit('spy turn',{'turn':new_turn,'roomid':room}, room=room)
+    GM.cardQ = {}
+    emit('spy turn',{'turn':new_turn,'roomid':room, 'flippedCards':GM.flippedCards, 'end':end}, room=room)
 
 
 @socketio.on('connect',namespace='/test')

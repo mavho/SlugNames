@@ -20,7 +20,7 @@ class RoomMaster():
             'Housing', 'Drunk Monkeys', 'Opers', 'Walk', 'Classroom Unit 2', \
             'MOSS', 'Cheating', 'Shrooms', 'Sage the Gemini', 'SJW']
 
-        self.flippedCards_set = set()
+        self.flippedCards = {} # 'rowcol' : 'R' 
         ###TODO change to dictionary
         self.team_red = []
         self.team_blue = []
@@ -35,6 +35,8 @@ class RoomMaster():
         self.usersid = {}  #usersid is a dictionary where username maps to their corresponding sid 
         self.current_turn = 'blue' # this should either be blue or red. We start with B to make B always go first.
         self.senders = 0 # represents the number of people who sent cards. We might not need it since we'll implement a timer 
+        self.clue_amt = 0 #represents the clue amount of the agent turn
+        self.cardQ = {} # represents the cards players have selected and sent to the server
 
 
     def changeWordBoard(self):
@@ -79,38 +81,80 @@ class RoomMaster():
                 res[i][n] = hold[i*5 + n]
         return res
 
-    def determineAction(self, cardQ, turn):
+    def maxSenders(self,cardQ,turn):
         """
-        CardQ is a dictionary indexed by "rowcol": and has 2 attr's row and col
+        determines if we go to the next phase 'determine action'
+        puts cards into GM's cardQ
+        """
+        #### we add it to the flipped cards
+        for cards in cardQ:
+            if cards in self.cardQ:
+                self.cardQ[cards] += 1
+            else:
+                self.cardQ[cards] = 1
 
-        TODO: send back an action. 
-        """
         if turn == 'blue' and self.senders != (len(self.team_blue) - 1):
             print("Not time to emit back anything",file=sys.stderr)
             return 'error'
         elif turn == 'red' and self.senders != (len(self.team_red) - 1):
             print("Not time to emit back anything",file=sys.stderr)
             return 'error'
-        """
-        if (row,col) in self.flippedCards_set:
-            print("already flipped before", file=sys.stderr)
-            return('','')
-
-        flipped_card = self.state_board[row][col]
-        self.flippedCards_set.add((row,col))
-         
-        if flipped_card != 'A' or flipped_card != 'I':
-            self._decrement(flipped_card)
-
-        return (self.state_board[row][col], self.word_board[row][col])
-        """
         return 'OK'
+    def determineAction(self, cardQ, turn):
+        """
+        CardQ is a dictionary indexed by "rowcol": and has 2 attr's row and col
+        """
+        ### This code is executed once everyone has sent in their stuff
+        flipped_cardsQ = self.achieveConsensus()
 
+        for card in flipped_cardsQ:
+            # ('01',3)
+            row = int(card[0][0])
+            col = int(card[0][1])
+            flipped_card = self.state_board[row][col]
+            if flipped_card != 'A':
+                self._decrement(flipped_card)
+            elif flipped_card == 'A':
+                return 'ASSASSIN'
+
+            cardstr= str(row) + '' + str(col)
+            if cardstr not in self.flippedCards:
+                self.flippedCards[cardstr] = self.state_board[row][col]
+            
+            print(self.isMatchingTurns(flipped_card),file=sys.stderr)
+            if not self.isMatchingTurns(flipped_card):
+                return 'SWITCH'
+
+        return 'STAY'
+
+
+    def isMatchingTurns(self,fc_turn):
+        if fc_turn == 'I':
+            return True
+        if fc_turn == 'B' and self.current_turn == 'blue':
+            return True
+        elif fc_turn == 'R' and self.current_turn == 'red':
+            return True
+        return False
+        
     def _decrement(self, card):
+        """
+        decrements count based on the card
+        B, R, I
+        """
         if card == 'B':
             self.blue_agent_count -= 1
         elif card == 'R':
             self.red_agent_count -= 1
-        
+        elif card == 'I':
+            self.innocent_bystanders_count -= 1
+    def achieveConsensus(self):
+        """
+        returns a list of the cards that were selected the top clue_amt times
 
-    
+        if ties, it's really up to how this sorted method works
+        """ 
+        res = []
+        res = sorted(self.cardQ.items(), key=lambda kv:kv[1])
+
+        return res[:int(self.clue_amt)]

@@ -19,22 +19,30 @@ $(document).ready(function() {
             thewords[(r*board_len)+c].setAttribute("id", r + '-' + c);
         }
     }
+    $("#debug").html(user_name + ' ' + team + ' ' + role
+     + ' ' + turn + ' spyturn:' + spy_turn + ' agent turn:' + agent_turn);
     function bindClick(row, col) {
         return function() {
             if(role != 'spymaster' && agent_turn){
                 let tostr = row + "" + col;
                 let tab_rc = $("#" + row + '-'+col);
-                // remove duplicate row col 
+
+                //User is not able to select any card in already flipped cards
+                if(tostr in flipped_cards){
+                    return;
+                }
                 if(tostr in cardQ){
                     delete cardQ[tostr];
-                    tab_rc.css('border-color','grey');
+                    tab_rc.css('border-color','white');
+                    tab_rc.css('background-color','white');
                 }else if (Object.keys(cardQ).length < cardQ_len){
                     cardQ[tostr] = {'row':row,'col':col};
                     tab_rc.css('border-color','green');
+                    tab_rc.css('background-color','green');
                 }
             }
         };
-    }
+    } 
     /*
     On click handlers for sending stuff. For debugging
     */
@@ -74,8 +82,17 @@ var agent_turn = false;
 
 //Signals start of spy turn
 socket.on('spy turn', function(msg){
+
+    console.log(msg);
+    //TODO: cleanup end screen etc.
+    if(msg['end'] == true){
+        $("#debug").html('GAME OVER ' + msg['turn'] + ' Loses');
+        return;
+    }
+    updateCardColors(msg['flippedCards']);
+
     if(role == "spymaster" && team == msg['turn']){
-        console.log("It is " + msg['turn'] + " spymaster turn")
+        console.log("It is " + msg['turn'] + " spymaster turn");
         spy_turn = true;
     }
     $("#debug").html(user_name + ' ' + team + ' ' + role
@@ -87,7 +104,7 @@ socket.on('agent turn', function(msg){
     cardQ_len = msg['amt']
     clue_word = msg['clue']
     if(team == msg['turn'] && role=="agent"){
-        console.log("It is " + msg['turn'] + " agent turn")
+        console.log("It is " + msg['turn'] + " agent's turn");
         agent_turn = true;
     }
     $("#debug").html(user_name + ' ' + team + ' ' + role
@@ -100,6 +117,37 @@ socket.on('flip card', function(msg){
     console.log(msg);
 });
 
+
+function updateCardColors(cards) {
+    //updates UI for all cards
+    for (let key in cards) {
+        let number = parseInt(key);
+        let row = Math.floor(number / 10);
+        row = row.toString();
+        let col = number % 10;
+        col = col.toString();
+        let tostr = row + "" + col;
+
+        let tab_rc = $("#" + row + '-' + col);
+        if (cards[tostr] == 'R') {
+            tab_rc.css('border-color', 'red');
+            flipped_cards[tostr] ='R';
+        }
+        else if (cards[tostr] == 'B') {
+            tab_rc.css('border-color', 'blue');
+            flipped_cards[tostr] ='B';
+        }
+        else if (cards[tostr] == 'I') {
+            tab_rc.css('border-color', 'white');
+            flipped_cards[tostr] ='I';
+        }
+        else {
+            tab_rc.css('border-color', 'black');
+            flipped_cards[tostr] ='A';
+            console.log('Brah i think you lost!');
+        }
+    }
+}
 // Wrapper for emit, check if you have permissions to emit.
 // emits and ends spy turn
 function attemptSpyEmit(clue,amt){
@@ -111,9 +159,19 @@ function attemptSpyEmit(clue,amt){
 
 //We set agent turn to false once they send to prevent them from sending multiple, even thought the next phase hasn't started
 function attemptAgentEmit(){
+    console.log("ATTEMPTING EMIT");
     if(agent_turn){
+        console.log("ATTEMPTING EMIT");
         socket.emit("flip card", {'roomid':roomid, 'turn':team, 'cards':cardQ});
         agent_turn = false;
+        //remove styling from the cardQ, then reset it
+        for(let card of Object.keys(cardQ)){
+            let rc = cardQ[card];
+            let tab_rc = $("#" + rc['row'] + '-'+ rc['col']);
+            tab_rc.css('border-color','grey');
+            tab_rc.css('background-color','white');
+        }
+        cardQ = {};
     }
 }
 
@@ -128,5 +186,5 @@ function checkInput(clue, amt){
     if(clue == '' || isNaN(amt) || amt == ''){
         return false;
     }
-    return true
+    return true;
 }
