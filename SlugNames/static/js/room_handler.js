@@ -18,6 +18,7 @@ var flipped_cards = {};
  */
 var turn = "";
 
+
 /**
  * Called upon creating a room
  */
@@ -84,11 +85,14 @@ function hideButtons(){
 socket.on('start game', function(msg) {
     var theurl = msg['url'];
     console.log('Start the game');
-    if (msg['spy'] == 'true'){
+    if (msg['spy'] == true){
         console.log('You are a spymaster on team ' + msg['team']);
         role = "spymaster";
         team = msg['team']
         theurl = '/spygame/' + room_name;
+        if (team == 'blue'){
+            isBlueSpyMaster = true;
+        }
     }
     else{
         console.log('You are a agent on team ' + msg['team']);
@@ -101,6 +105,7 @@ socket.on('start game', function(msg) {
         // url: theurl, 
         }).done(function(reply){
             $('#container').html(reply);
+            console.log("emitting start of game" + turn);
             //This essentially starts the game!
             socket.emit("spy turn", {'turn':turn, 'roomid':roomid});
             $('#maintitle').append("Player: " + user_name);

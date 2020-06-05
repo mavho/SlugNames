@@ -14,6 +14,8 @@ socketio = SocketIO(app)
 ### TODO: We'll want to either implement a DB or redis later. This will be fine for now
 CHANNELS = {}
 
+### tracks sid and associates with user,room
+sid_username_room = {}
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
@@ -50,6 +52,7 @@ def create_room(data):
     url = url_for('theGame', roomid=room) 
     GM.users.append(user_name)
     GM.usersid[user_name] = request.sid 
+    sid_username_room[request.sid] = (user_name,room)
     print("Host " + user_name + " created " + room, file=sys.stderr)  
 
     emit('create room', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users, 'room': room}, room=room)
@@ -72,6 +75,7 @@ def join_theroom(data):
     print("Client " + user_name +" joined " + room, file=sys.stderr)
     GM.users.append(user_name)
     GM.usersid[user_name] = request.sid
+    sid_username_room[request.sid] = (user_name,room)
     emit('join theroom', {'GM': str(GM.word_board), 'url': url, 'user': str(user_name), 'allusers': GM.users}, room=room)
 
 @socketio.on('start game', namespace='/test')
@@ -96,23 +100,17 @@ def start_game(data):
     spyblue = random.randrange(0, len(GM.team_blue))
     GM.spymasters.append(GM.team_red[spyred])
     GM.spymasters.append(GM.team_blue[spyblue])
-    print("Starting game for room: " + room, file=sys.stderr)
-    print('Chumps on team red: ' + str(GM.team_red))
-    print('Chumps on team blue: ' + str(GM.team_blue))
-    print('Spymasters: ' + str(GM.spymasters))
     url = url_for('theGame', roomid=room)
-    print('Dictionaries: ')
-    print(str(GM.usersid))
     for user in GM.team_red:
+        is_spy = False
         if user in GM.spymasters:
-            emit('start game', {'url': url, 'spy': 'true', 'team': 'red', 'turn': GM.current_turn}, room=GM.usersid[user])
-        else:
-            emit('start game', {'url': url, 'spy' : 'false', 'team': 'red', 'turn': GM.current_turn}, room=GM.usersid[user])
+            is_spy = True
+        emit('start game', {'url': url, 'spy': is_spy, 'team': 'red', 'turn': GM.current_turn}, room=GM.usersid[user])
     for user in GM.team_blue:
+        is_spy = False
         if user in GM.spymasters: 
-            emit('start game', {'url': url, 'spy': 'true', 'team': 'blue', 'turn': GM.current_turn}, room=GM.usersid[user])
-        else:
-            emit('start game', {'url': url, 'spy' : 'false', 'team': 'blue', 'turn': GM.current_turn}, room=GM.usersid[user])
+            is_spy = True
+        emit('start game', {'url': url, 'spy' : is_spy, 'team': 'blue', 'turn': GM.current_turn}, room=GM.usersid[user])
 
 
 ### the spy turn has started.
@@ -125,15 +123,12 @@ def spy_phase(data):
     room = data['roomid']
     turn = data['turn']
     GM = CHANNELS.get(room)
-    print(data,file=sys.stderr)
     if GM is None:
         print("Handle error")
     if turn == "start":
-        print("Emitting start of game, for turn blue", file=sys.stderr)
-        emit('spy turn', {'turn': 'blue'}, room=room)
-    
+        emit('spy turn', {'turn': 'blue'}, room=room,include_self=True)
     else:
-        emit('spy turn', {'turn':GM.current_turn}, room=room)
+        emit('spy turn', {'turn':GM.current_turn}, room=room, include_self=True)
 
 ### signals start of agent turn, broadcast it
 @socketio.on('agent turn',namespace='/test')
@@ -161,14 +156,12 @@ def flip_card(data):
 
     TODO: timer implementation
     """
-    # data should have room name or something
-    print('data in cards: ', end='', file=sys.stderr)
-    print(data['cards'],file=sys.stderr)
     room = data['roomid']
     cur_turn = data['turn']
     cards = data['cards']
     GM = CHANNELS[room]
     GM.senders += 1
+    ### if not all senders have sent their cards dont continue
     if GM.maxSenders(cards,cur_turn) != 'OK':
         return
 
@@ -206,6 +199,14 @@ def test_connect():
 @socketio.on('disconnect',namespace='/test')
 def test_disconnect():
     print('This guy disconnected: ' + request.sid, file=sys.stderr)
+    if request.sid in sid_username_room:
+        user,room= sid_username_room[request.sid]
+        GM = CHANNELS[room]
+        #(user,room)
+        leave_room(room)
+        del sid_username_room[request.sid]
+        GM.removeUser(user)
+        emit('disconnect', {'user': user}, room=room)
 
 
 if __name__ == '__main__':

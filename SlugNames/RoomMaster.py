@@ -178,3 +178,18 @@ class RoomMaster():
         res = sorted(self.cardQ.items(), key=lambda kv:kv[1],reverse=True)
 
         return res[:int(self.clue_amt)]
+
+    def removeUser(self,user):
+        """
+        removes user from respective teams 
+        """
+        for i in range(len(self.team_red)):
+            if user == self.team_red[i]:
+                del self.team_red[i]
+                break
+        for i in range(len(self.team_blue)):
+            if user == self.team_blue[i]:
+                del self.team_blue[i]
+                break
+        if user in self.usersid:
+            del self.usersid[user]

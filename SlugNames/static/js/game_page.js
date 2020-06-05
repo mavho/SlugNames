@@ -121,6 +121,9 @@ socket.on('flip card', function(msg){
     console.log(msg);
 });
 
+socket.on('disconnect',function(msg){
+    console.log(msg);
+});
 
 function updateCardColors(cards) {
     //updates UI for all cards
